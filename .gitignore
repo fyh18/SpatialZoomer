@@ -16,5 +16,8 @@ build/
 results/
 figures/
 
+# data
+*.h5ad
+
 # local test files
 local_config.ini

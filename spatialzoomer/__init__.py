@@ -1,1 +1,1 @@
-from .subtype_analysis import SubclusterAnalysis
+from .subtype_detection import SubclusterAnalysis
