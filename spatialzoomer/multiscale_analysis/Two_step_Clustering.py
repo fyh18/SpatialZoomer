@@ -187,9 +187,9 @@ def Clustering_raw_signal(adata,
     adata, adata_kmeans =  TwoStepClustering(adata, data, n_clusters_kmeans = n_clusters_kmeans, scale_data = scale_data, resolution = resolutions, title = title)
     adata_kmeans.write(save_path + '/' + runLabel +'_object_kmeans_'+title+'.h5ad')
 
-    for res in resolutions:
-        path  =  save_path +'/Clustering_signal_'+str(title) + '_res'+ str(res)+'.png'
-        plotClustering(adata, adata_kmeans, keys = ['leiden_'+str(title)+'_res'+str(res)], title = title, save_path=path, dpi = 300, plot_number = 2, figsize = figsize)
+    # for res in resolutions:
+    #     path  =  save_path +'/Clustering_signal_'+str(title) + '_res'+ str(res)+'.png'
+    #     plotClustering(adata, adata_kmeans, keys = ['leiden_'+str(title)+'_res'+str(res)], title = title, save_path=path, dpi = 300, plot_number = 2, figsize = figsize)
 
     end_time = time.time()
     elapsed_time = end_time - start_time
@@ -216,9 +216,9 @@ def Clustering_transformed_signal(adata, transformed_signals, typical_scales_df,
         adata, adata_kmeans =  TwoStepClustering(adata, data, n_clusters_kmeans = n_clusters_kmeans, scale_data = scale_data,  resolution = resolutions, title = title)
         adata_kmeans.write(save_path + '/' + runLabel +'_object_kmeans_'+title+'.h5ad')
 
-        for res in resolutions:
-            path  =  save_path +'/Clustering_signal_'+str(title) + '_res'+ str(res)+'.png'
-            plotClustering(adata, adata_kmeans, keys = ['leiden_'+str(title)+'_res'+str(res)], title = title, save_path=path, dpi = 300, plot_number = 4, figsize = figsize, ref_keys = 'leiden_Raw_res1')
+        # for res in resolutions:
+        #     path  =  save_path +'/Clustering_signal_'+str(title) + '_res'+ str(res)+'.png'
+        #     plotClustering(adata, adata_kmeans, keys = ['leiden_'+str(title)+'_res'+str(res)], title = title, save_path=path, dpi = 300, plot_number = 4, figsize = figsize, ref_keys = 'leiden_Raw_res1')
 
         end_time = time.time()
         print(f"Time taken to perform clustering for signal at scale {scale}: {end_time - start_time:.4f} seconds")

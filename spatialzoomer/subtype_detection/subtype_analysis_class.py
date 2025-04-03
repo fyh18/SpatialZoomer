@@ -59,7 +59,7 @@ class SubclusterAnalysis:
         mpl.rcParams['pdf.fonttype'] = 42
         mpl.rcParams['ps.fonttype'] = 42
     
-    def calculate_metrics(self, nonepi=True, plot_spatial=True):
+    def calculate_metrics(self, nonepi=True, plot_clusters=True):
         """
         Plot covariance-scale curves and covariance values.
         input ad: AnnData object, with umaps at raw ("X_umap_Raw") and different scales (for example "X_umap_scale0.01")
@@ -76,22 +76,19 @@ class SubclusterAnalysis:
         self.ad.uns[self.cluster_key + '_colors'] = sorted_colors
         self.ad.obsm['X_umap'] = self.ad.obsm['X_umap_Raw']
 
-        fig, ax = plt.subplots(figsize=(5, 5), dpi=self.dpi)
-        sc.pl.umap(self.ad, 
-                color=self.cluster_key, 
-                size=5, 
-                ax=ax, 
-                show=False, 
-                title='Cell clusters')
-        for collection in ax.collections:
-            collection.set_rasterized(True) 
-        plt.savefig(self.save_path + "/umap_clusters.pdf", bbox_inches='tight', dpi=self.dpi)
-        plt.show()
-        plt.close()
+        if plot_clusters:
+            fig, axs = plt.subplots(1, 2, figsize=(10, 4), dpi=self.dpi)
+            sc.pl.umap(self.ad, 
+                    color=self.cluster_key, 
+                    size=5, 
+                    ax=axs[0], 
+                    show=False, 
+                    title='Cell clusters')
+            for collection in axs[0].collections:
+                collection.set_rasterized(True) 
+            # hide legend
+            axs[0].get_legend().remove()
 
-        ######################### plot spatial #########################
-        if plot_spatial:
-            fig, ax = plt.subplots(figsize=(18, 18), dpi=self.dpi)
             sq.pl.spatial_scatter(
                 self.ad, 
                 library_id="spatial", 
@@ -105,10 +102,10 @@ class SubclusterAnalysis:
                 outline=False,
                 img=False,
                 marker='.',
-                ax=ax,
+                ax=axs[1],
                 title='Cell clusters',
             )
-            for collection in ax.collections:
+            for collection in axs[1].collections:
                 collection.set_rasterized(True)
             plt.tight_layout()
             plt.savefig(self.save_path + "/spatial_clusters.pdf", bbox_inches='tight', dpi=self.dpi)
@@ -261,7 +258,7 @@ class SubclusterAnalysis:
         ad_selected.obs['cluster_label'] = list(res.astype(str))
 
         ad_selected_plot = ad_selected[ad_selected.obs['cluster_label'] != '-1']
-        ad_selected_plot.uns['cluster_label_colors'] = [self.colors_3[0:2]]
+        ad_selected_plot.uns['cluster_label_colors'] = self.colors_3[0:2]
         fig, ax = plt.subplots(figsize=(5, 5), dpi=self.dpi)
         sc.pl.umap(ad_selected_plot, color=['cluster_label'], title='subclusters at scale' + str(self.optimal_scale), 
                 show=False, ax=ax, size=5)

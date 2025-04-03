@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from kneed import KneeLocator
 from scipy.spatial.distance import cdist
 from matplotlib.patches import Rectangle
+import matplotlib.gridspec as gridspec
 import seaborn as sns  
 import pandas as pd
 import time
@@ -149,7 +150,7 @@ def find_cluster_centers(corr_matrix, clusters):
 
 
 
-def Identify_Typical_Scales(transformed_signals, scales, min_clusters = 3, max_clusters = 10, figsize_elbow = (5, 4), figsize_heatmap = (11, 9), save_path=None):
+def Identify_Typical_Scales(transformed_signals, scales, min_clusters = 3, max_clusters = 10, figsize = (10, 5), save_path=None):
     """
     Identify the optimal number of frequency bands using dynamic programming and the elbow method 
     for clustering based on within-cluster variance.
@@ -168,12 +169,9 @@ def Identify_Typical_Scales(transformed_signals, scales, min_clusters = 3, max_c
     max_clusters : int, optional, default: 10
         Maximum number of clusters to consider for the elbow method.
     
-    figsize_elbow : tuple, optional, default: (5, 4)
-        Figure size for the elbow plot.
-        
-    figsize_heatmap : tuple, optional, default: (11, 9)
-        Figure size for the heatmap plot.
-    
+    figsize : tuple, optional, default: (5, 10)
+        Figure size for the elbow plot and heatmap.
+
     save_path : str, optional, default: None
         Path to save plots. If None, the plots will not be saved.
 
@@ -208,46 +206,40 @@ def Identify_Typical_Scales(transformed_signals, scales, min_clusters = 3, max_c
     # Step 3: Detect the elbow point
     kneedle = KneeLocator(range(3, max_clusters + 1), variances, curve='convex', direction='decreasing',  S=1)
 
-    # Step 4: Plot elbow curve and annotate the elbow point
-    plt.figure(figsize=figsize_elbow)
-    plt.plot(range(3, max_clusters + 1), variances, marker='o')
-    plt.xlabel('Number of Clusters')
-    plt.ylabel('Total Within-Cluster Variance')
-    plt.title('Elbow Method for Optimal Number of Clusters')
+    # fig, axs = plt.subplots(1, 2, figsize=figsize)
+    plt.figure(figsize=figsize)
+    gs = gridspec.GridSpec(1, 2, width_ratios=[4, 6])
+    ax1 = plt.subplot(gs[0])
+    ax1.plot(range(3, max_clusters + 1), variances, marker='o')
+    ax1.set_xlabel('Number of Clusters')
+    ax1.set_ylabel('Total Within-Cluster Variance')
+    ax1.set_title('Elbow Method for Optimal Number of Clusters')
     optimal_k = kneedle.elbow
     if optimal_k is not None:
-        plt.axvline(x=optimal_k, color='red', linestyle='--', label=f'Elbow at k={optimal_k}')
-        plt.legend()
-    
-    if save_path:
-        plt.savefig(f'{save_path}_selected_scales_elbow.png', dpi =300) 
-        plt.savefig(f'{save_path}_selected_scales_elbow.pdf', dpi=300)
+        ax1.axvline(x=optimal_k, color='red', linestyle='--', label=f'Elbow at k={optimal_k}')
+        ax1.legend()
 
-    plt.show()
-    print(f"The optimal number of clusters is: {optimal_k}")
+    ax2 = plt.subplot(gs[1])
+    sns.heatmap(mean_correlation_matrix, cmap='coolwarm', annot=False, cbar=True, 
+                xticklabels=scales, yticklabels=scales, ax=ax2)
+    ax2.set_title('Optimal Clustering Using Dynamic Programming')
 
-
-    # Step 5: Run dynamic programming to get optimal partitions
     optimal_clusters = dp_optimal_clustering(mean_correlation_matrix, optimal_k)
     cluster_centers = find_cluster_centers(mean_correlation_matrix, optimal_clusters)
-    
-    # Plot heatmap with clustered blocks
-    plt.figure(figsize=figsize_heatmap)
-    ax = sns.heatmap(mean_correlation_matrix, cmap='coolwarm', annot=False, cbar=True, xticklabels=scales, yticklabels=scales)
-    plt.title('Optimal Clustering Using Dynamic Programming')
-    
-    # Add rectangles to indicate clusters
     for i, (start, end) in enumerate(optimal_clusters):
-        ax.add_patch(Rectangle((start, start), end - start + 1, end - start + 1, fill=False, edgecolor='black', lw=2))
-        ax.scatter(start + 0.5, start + 0.5, color='blue', marker='o', s=50)
-        
+        ax2.add_patch(Rectangle((start, start), end - start + 1, end - start + 1, 
+                                fill=False, edgecolor='black', lw=2))
+        ax2.scatter(start + 0.5, start + 0.5, color='blue', marker='o', s=50)
     for center in cluster_centers:
-        ax.scatter(center + 0.5, center + 0.5, color='blue', marker='o', s=50)
-    
+        ax2.scatter(center + 0.5, center + 0.5, color='blue', marker='o', s=50)
+
+    plt.tight_layout()
     if save_path:
-        plt.savefig(f'{save_path}_selected_scales_heatmap.png', dpi =300) 
-        plt.savefig(f'{save_path}_selected_scales_heatmap.pdf', dpi=300)
+        plt.savefig(save_path + '/typical_scales.png', dpi=300)
+        # plt.savefig(f'{save_path}_combined.pdf', dpi=300)
     plt.show()
+
+    print(f"The optimal number of clusters is: {optimal_k}")
     
     print("Optimal clusters (start, end):", optimal_clusters)
     scale_centers = [scales[scale] for scale in cluster_centers]

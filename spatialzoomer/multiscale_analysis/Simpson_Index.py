@@ -129,22 +129,4 @@ def plot_simpson_indices(adata, scales, clusters, save_path = None):
     for scale in clusters:
         ratios_dict[scale] = simpson_spatial_dict[scale] / simpson_transcriptomic_dict[scale]
 
-    mean_ratios = [np.mean(ratios_dict[scale]) for scale in clusters]
-    std_ratios = [np.std(ratios_dict[scale], ddof=1) / np.sqrt(len(ratios_dict[scale])) for scale in clusters]  # 计算标准误差
-
-    plt.figure(figsize=(5, 4))
-    plt.errorbar(scales, mean_ratios, yerr=std_ratios, fmt='-o', color='b', ecolor='gray', capsize=5, label='Average Ratio')
-
-    plt.axhline(y=1, color='red', linestyle='--', label='y = 1')
-
-    plt.title('Average Ratios across Scales', fontsize=12)
-    plt.xlabel('Leiden Scales', fontsize=10)
-    plt.ylabel('Ratios', fontsize=10)
-    plt.xticks(rotation=0)
-    plt.legend(loc='upper left')
-    plt.tight_layout()
-
-    if save_path:
-        plt.savefig(save_path + 'Average_Ratios_across_Scales.pdf', dpi=300)
-    plt.show()
     return simpson_spatial_dict, simpson_transcriptomic_dict, ratios_dict
