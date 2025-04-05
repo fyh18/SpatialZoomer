@@ -22,6 +22,8 @@ def plot_clusters(ad, typical_scales, resolution):
         )
         for collection in axes[i, 0].collections:
             collection.set_rasterized(True)
+        # hide legend
+        axes[i, 0].legend_.remove()
 
         sq.pl.spatial_scatter(
             ad, 

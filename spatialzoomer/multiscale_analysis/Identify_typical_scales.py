@@ -150,7 +150,7 @@ def find_cluster_centers(corr_matrix, clusters):
 
 
 
-def Identify_Typical_Scales(transformed_signals, scales, min_clusters = 3, max_clusters = 10, figsize = (10, 5), save_path=None):
+def Identify_Typical_Scales(transformed_signals, scales, min_clusters = 3, max_clusters = 10, figsize = (12, 6), save_path=None):
     """
     Identify the optimal number of frequency bands using dynamic programming and the elbow method 
     for clustering based on within-cluster variance.

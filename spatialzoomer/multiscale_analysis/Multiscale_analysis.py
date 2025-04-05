@@ -34,6 +34,7 @@ class MultiscaleAnalysis:
         # clustering
         self.scales_df_use = None
         self.clustered = False
+        self.resolutions = None
 
         # simpson indices
         self.simpson_spatial_dict = None
@@ -101,6 +102,7 @@ class MultiscaleAnalysis:
         """
         if resolutions is None:
             resolutions = [0.4, 0.6, 0.8, 1, 1.2]
+        self.resolutions = resolutions
         
         if self.typical_scales_df is None:
             raise ValueError("Typical scales are not available. Please run `identify_typical_scales` first.")
@@ -132,9 +134,11 @@ class MultiscaleAnalysis:
         self.scales_df_use = scales_df_use
         self.clustered = True
     
-    def plot_simpson(self):
+    def plot_simpson(self, resolution=None):
         if self.clustered is False:
             raise ValueError("Clustering has not been performed. Please run `clustering` first.")
+        if resolution is None:
+            resolution = self.resolutions[-1]
         
         self.adata = getKNN(
             self.adata, 
@@ -142,9 +146,9 @@ class MultiscaleAnalysis:
             name = 'expr_knn', 
             n_neighbors = self.n_neighbors
             )
-        typical_scales = self.typical_scales_df['Scale'].values
+        typical_scales = self.scales_df_use['Scale'].values
         scales_plot = ['Raw'] + ['scale' + str(scale) for scale in typical_scales]
-        clusters_use = ['leiden_' + str(scale) + '_res1' for scale in scales_plot]
+        clusters_use = ['leiden_' + str(scale) + '_res' + str(resolution) for scale in scales_plot]
         simpson_spatial_dict, simpson_expr_dict, ratios_dict = plot_simpson_indices(
             self.adata, 
             scales_plot, 
