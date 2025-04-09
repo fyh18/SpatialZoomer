@@ -148,8 +148,8 @@ def getKNN(adata, use_rep = 'spatial', name = 'spatial_knn', n_neighbors = 15, f
 
 
     if results_report:
-        print('Maximum similarities: ', np.max(similarities))
-        print('Minimum similarities: ', np.min(similarities))
+        # print('Maximum similarities: ', np.max(similarities))
+        # print('Minimum similarities: ', np.min(similarities))
         print('Median similarities: ', np.median(similarities))
 
     n_cells = coords.shape[0]

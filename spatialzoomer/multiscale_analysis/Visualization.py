@@ -39,7 +39,7 @@ def plot_clusters(ad, typical_scales, resolution):
             img=False,
             marker='.',
             ax=axes[i, 1],
-            title='Cell clusters',
+            title='Cell clusters\n scale={scale}, resolution={resolution}'.format(scale=scale, resolution=resolution),
         )
         for collection in axes[i, 1].collections:
             collection.set_rasterized(True)
